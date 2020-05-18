@@ -14,6 +14,7 @@ const (
 	defaultKafkaBrokers            = "kafka-server:9092"
 	defaultTopicName               = "test_topic_name"
 	defaultConsumerGroupDefinition = "test_consumer_group_definition"
+	defaultClientVersion           = "2.1.1"
 )
 
 func main() {
@@ -77,6 +78,11 @@ func (c *ConsumerHandler) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 
 func initConsumer(brokerHosts []string) (sarama.ConsumerGroup, error) {
 	var config = sarama.NewConfig()
+	version, err := sarama.ParseKafkaVersion(defaultClientVersion)
+	if err != nil {
+		return nil, err
+	}
+	config.Version = version
 	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
 	return sarama.NewConsumerGroup(brokerHosts, defaultConsumerGroupDefinition, config)
